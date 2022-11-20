@@ -28,7 +28,7 @@ function App() {
           <Search input={input} setInput={setInput}/>
         </Row>
         <Row>
-          <Cards />
+          <Cards input={input}/>
         </Row>
         <Footer />
       </Container>
