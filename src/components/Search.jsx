@@ -1,12 +1,14 @@
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import NewCard from './NewCard.jsx';
 import { useState } from 'react';
 
-const Search = (props) => {
+const Search = () => {
+    const [ input, setInput ] = useState([]);
     const handleSubmit = (e) => {
         e.preventDefault();
-        props.setInput(e.target.search.value);
+        setInput(e.target.search.value.split(' '));
         e.target.reset();
     }
 
@@ -22,6 +24,13 @@ const Search = (props) => {
                     <Form.Control className="border-end-0 border rounded-pill" type="text" placeholder="Insert Sentence Here!" name="search"/>
                     <Button type="submit" variant="outline-success" className="rounded-pill ms-n3">Generate!</Button>
                 </Form>
+            </Container>
+            <Container className="d-flex flex-wrap justify-content-center">
+                {input.map(word => {
+                    return (
+                        <NewCard key={word} word={word}/>
+                    )
+                })}
             </Container>
         </Container>
     )

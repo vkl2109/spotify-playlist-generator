@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 
-const Cards = (props) => {
+const NewCard = (props) => {
     const clientID = import.meta.env.VITE_CLIENT_ID
     const clientSecret = import.meta.env.VITE_CLIENT_SECRET
-    const [ accessToken, setAccessToken ] = useState();
-    const [ audioTracks, setAudioTracks ] = useState({});
+    const [ audioTrack, setAudioTrack ] = useState(null);
+
     const getAccessToken = async () => {
         const result = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
@@ -16,6 +18,7 @@ const Cards = (props) => {
         });
         return result.json();
     }
+
     const getTracks = async (keyword, token) => {
         const result = await fetch ('https://api.spotify.com/v1/search?q=' + keyword + '&type=track', {
             method: 'GET',
@@ -26,29 +29,32 @@ const Cards = (props) => {
         })
         return result.json();
     }
+
     useEffect(() => {
         const runFuncs = async () => {
             let token = await getAccessToken();
-            setAccessToken(token.access_token);
-            let tracks = await getTracks('Madonna', accessToken);
-            setAudioTracks(tracks.tracks.items);
-            console.log(tracks.tracks.items);
+            let tracks = await getTracks(props.word, token.access_token);
+            setAudioTrack(tracks.tracks.items[0]);
+            console.log(audioTrack);
         }
         runFuncs();
     }, [])
+
     return (
-        <div>
-            {
-                // audioTracks.map(track => {
-                //     let srcUrl = `https://open.spotify.com/embed/track/${track.id}?utm_source=generator`;
-                //     return (
-                //         <iframe src={srcUrl} allow='autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture' loading='lazy'>
-                //         </iframe>
-                //     )
-                // })
-            }
+        <div className="mt-5">
+            {audioTrack ? 
+            (
+                <Card style={{width: '10rem'}}>
+                    <Card.Img variant="top" src={audioTrack.album.images[0].url} />
+                    <Card.Body className="d-flex flex-column justify-content-center align-items-center">
+                        <Card.Title>{audioTrack.name}</Card.Title>
+                        <Card.Text className="text-center">{audioTrack.artists[0].name}</Card.Text>
+                        <Button variant="success" href={audioTrack.external_urls.spotify} target='_blank'>Play</Button>
+                    </Card.Body>
+                </Card>
+            ) : (<h1>{props.word} is loading...</h1>)}
         </div>
     )
 }
 
-export default Cards;
+export default NewCard;
